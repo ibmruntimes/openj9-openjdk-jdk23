@@ -455,21 +455,11 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argv */
         } \
     } while (JNI_FALSE)
 
-#define CHECK_EXCEPTION_FAIL() \
+#define CHECK_EXCEPTION_NULL_FAIL(obj) \
     do { \
         if ((*env)->ExceptionOccurred(env)) { \
-            (*env)->ExceptionClear(env); \
             return 0; \
-        } \
-    } while (JNI_FALSE)
-
-
-#define CHECK_EXCEPTION_NULL_FAIL(mainObject) \
-    do { \
-        if ((*env)->ExceptionOccurred(env)) { \
-            (*env)->ExceptionClear(env); \
-            return 0; \
-        } else if (mainObject == NULL) { \
+        } else if (obj == NULL) { \
             return 0; \
         } \
     } while (JNI_FALSE)
@@ -482,7 +472,7 @@ int
 invokeStaticMainWithArgs(JNIEnv *env, jclass mainClass, jobjectArray mainArgs) {
     jmethodID mainID = (*env)->GetStaticMethodID(env, mainClass, "main",
                                   "([Ljava/lang/String;)V");
-    CHECK_EXCEPTION_FAIL();
+    CHECK_EXCEPTION_NULL_FAIL(mainID);
     (*env)->CallStaticVoidMethod(env, mainClass, mainID, mainArgs);
     return 1;
 }
@@ -494,15 +484,15 @@ invokeStaticMainWithArgs(JNIEnv *env, jclass mainClass, jobjectArray mainArgs) {
 int
 invokeInstanceMainWithArgs(JNIEnv *env, jclass mainClass, jobjectArray mainArgs) {
     jmethodID constructor = (*env)->GetMethodID(env, mainClass, "<init>", "()V");
-    CHECK_EXCEPTION_FAIL();
+    CHECK_EXCEPTION_NULL_FAIL(constructor);
     jobject mainObject = (*env)->NewObject(env, mainClass, constructor);
     CHECK_EXCEPTION_NULL_FAIL(mainObject);
-    jmethodID mainID = (*env)->GetMethodID(env, mainClass, "main",
-                                 "([Ljava/lang/String;)V");
-    CHECK_EXCEPTION_FAIL();
+    jmethodID mainID =
+        (*env)->GetMethodID(env, mainClass, "main", "([Ljava/lang/String;)V");
+    CHECK_EXCEPTION_NULL_FAIL(mainID);
     (*env)->CallVoidMethod(env, mainObject, mainID, mainArgs);
     return 1;
- }
+}
 
 /*
  * Invoke a static main without arguments. Returns 1 (true) if successful otherwise
@@ -512,7 +502,7 @@ int
 invokeStaticMainWithoutArgs(JNIEnv *env, jclass mainClass) {
     jmethodID mainID = (*env)->GetStaticMethodID(env, mainClass, "main",
                                        "()V");
-    CHECK_EXCEPTION_FAIL();
+    CHECK_EXCEPTION_NULL_FAIL(mainID);
     (*env)->CallStaticVoidMethod(env, mainClass, mainID);
     return 1;
 }
@@ -524,12 +514,12 @@ invokeStaticMainWithoutArgs(JNIEnv *env, jclass mainClass) {
 int
 invokeInstanceMainWithoutArgs(JNIEnv *env, jclass mainClass) {
     jmethodID constructor = (*env)->GetMethodID(env, mainClass, "<init>", "()V");
-    CHECK_EXCEPTION_FAIL();
+    CHECK_EXCEPTION_NULL_FAIL(constructor);
     jobject mainObject = (*env)->NewObject(env, mainClass, constructor);
     CHECK_EXCEPTION_NULL_FAIL(mainObject);
     jmethodID mainID = (*env)->GetMethodID(env, mainClass, "main",
                                  "()V");
-    CHECK_EXCEPTION_FAIL();
+    CHECK_EXCEPTION_NULL_FAIL(mainID);
     (*env)->CallVoidMethod(env, mainObject, mainID);
     return 1;
 }
@@ -551,6 +541,11 @@ JavaMain(void* _args)
     jobjectArray mainArgs;
     int ret = 0;
     jlong start = 0, end = 0;
+    jclass helperClass;
+    jfieldID isStaticMainField;
+    jboolean isStaticMain;
+    jfieldID noArgMainField;
+    jboolean noArgMain;
 
     RegisterThread();
 
@@ -688,12 +683,31 @@ JavaMain(void* _args)
      * The main method is invoked here so that extraneous java stacks are not in
      * the application stack trace.
      */
-    if (!invokeStaticMainWithArgs(env, mainClass, mainArgs) &&
-        !invokeInstanceMainWithArgs(env, mainClass, mainArgs) &&
-        !invokeStaticMainWithoutArgs(env, mainClass) &&
-        !invokeInstanceMainWithoutArgs(env, mainClass)) {
-        ret = 1;
-        LEAVE();
+
+    helperClass = GetLauncherHelperClass(env);
+    isStaticMainField = (*env)->GetStaticFieldID(env, helperClass, "isStaticMain", "Z");
+    CHECK_EXCEPTION_NULL_LEAVE(isStaticMainField);
+    isStaticMain = (*env)->GetStaticBooleanField(env, helperClass, isStaticMainField);
+
+    noArgMainField = (*env)->GetStaticFieldID(env, helperClass, "noArgMain", "Z");
+    CHECK_EXCEPTION_NULL_LEAVE(noArgMainField);
+    noArgMain = (*env)->GetStaticBooleanField(env, helperClass, noArgMainField);
+
+    if (isStaticMain) {
+        if (noArgMain) {
+            ret = invokeStaticMainWithoutArgs(env, mainClass);
+        } else {
+            ret = invokeStaticMainWithArgs(env, mainClass, mainArgs);
+        }
+    } else {
+        if (noArgMain) {
+            ret = invokeInstanceMainWithoutArgs(env, mainClass);
+        } else {
+            ret = invokeInstanceMainWithArgs(env, mainClass, mainArgs);
+        }
+    }
+    if (!ret) {
+        CHECK_EXCEPTION_LEAVE(1);
     }
 
     /*
