@@ -116,14 +116,6 @@ AC_DEFUN([FLAGS_SETUP_LDFLAGS_HELPER],
       fi
     fi
 
-  elif test "x$TOOLCHAIN_TYPE" = xxlc; then
-    # We need '-qminimaltoc' or '-qpic=large -bbigtoc' if the TOC overflows.
-    # Hotspot now overflows its 64K TOC (currently only for debug),
-    # so we build with '-qpic=large -bbigtoc'.
-    if test "x$DEBUG_LEVEL" != xrelease; then
-      DEBUGLEVEL_LDFLAGS_JVM_ONLY="$DEBUGLEVEL_LDFLAGS_JVM_ONLY -bbigtoc"
-    fi
-
   elif test "x$TOOLCHAIN_TYPE" = xclang && test "x$OPENJDK_TARGET_OS" = xaix; then
     # We need '-fpic' or '-fpic -mcmodel=large -Wl,-bbigtoc' if the TOC overflows.
     # Hotspot now overflows its 64K TOC (currently only for debug),
