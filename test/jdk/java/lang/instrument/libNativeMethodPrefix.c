@@ -1,12 +1,10 @@
 /*
- * Copyright (c) 2022, 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * published by the Free Software Foundation.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -22,11 +20,20 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package jdk.internal.classfile.impl;
 
-import java.lang.classfile.CodeBuilder;
+#include <stdio.h>
+#include "jni.h"
 
-public sealed interface TerminalCodeBuilder extends CodeBuilder, LabelContext
-        permits DirectCodeBuilder, BufferedCodeBuilder {
-    int curTopLocal();
+JNIEXPORT jlong JNICALL
+Java_NativeMethodPrefixApp_00024Dummy_fooBarNativeMethod(JNIEnv *env, jclass clazz)
+{
+    fprintf(stderr, "native method called\n");
+    return 42;
+}
+
+JNIEXPORT jint JNICALL
+JNI_OnLoad(JavaVM *vm, void *reserved)
+{
+    fprintf(stderr, "native library loaded\n");
+    return JNI_VERSION_1_1; // this native library needs the very basic JNI support
 }
