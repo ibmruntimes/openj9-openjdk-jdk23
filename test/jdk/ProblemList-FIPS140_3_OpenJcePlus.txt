@@ -227,7 +227,7 @@ java/security/SecureRandom/SerializedSeedTest.java https://github.com/ibmruntime
 java/security/SecureRandom/ThreadSafe.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 java/security/Security/CaseInsensitiveAlgNames.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 java/security/Security/ClassLoaderDeadlock/Deadlock.sh https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
-java/security/Security/ConfigFileTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,windows-all
+java/security/Security/ConfigFileTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 java/security/Security/ProviderFiltering.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 java/security/Security/removing/RemoveProviderByIdentity.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 java/security/Security/signedfirst/DynStatic.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
@@ -472,7 +472,6 @@ java/io/Serializable/serialFilter/GlobalFilterTest.java https://github.com/ibmru
 java/io/Serializable/serialFilter/SerialFilterFactoryTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 java/nio/channels/DatagramChannel/AdaptorMulticasting.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 linux-x64,windows-all
 java/nio/channels/Selector/SelectWithConsumer.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
-java/nio/channels/Selector/SelectWithConsumer.java#id0 https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 java/nio/channels/etc/OpenAndConnect.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 linux-x64,windows-all
 java/nio/channels/etc/ProtocolFamilies.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 linux-x64,windows-all
 java/nio/channels/unixdomain/IOExchanges.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
@@ -683,6 +682,7 @@ jdk/security/logging/TestSecurityPropertyModificationLog.java https://github.com
 jdk/security/logging/TestTLSHandshakeLog.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 sun/rmi/server/MarshalOutputStream/marshalForeignStub/MarshalForeignStub.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 sun/rmi/transport/tcp/disableMultiplexing/DisableMultiplexing.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
+sun/security/ec/ECDHKeyAgreementParamValidation.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 sun/security/ec/ECDSAPrvGreaterThanOrder.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 sun/security/ec/InvalidCurve.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 sun/security/ec/NSASuiteB/TestSHAwithECDSASignatureOids.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
@@ -709,6 +709,7 @@ sun/security/jca/PreferredProviderNegativeTest.java https://github.com/ibmruntim
 sun/security/jca/PreferredProviderTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 sun/security/mscapi/AccessKeyStore.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 windows-all
 sun/security/mscapi/AllTypes.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 windows-all
+sun/security/mscapi/DupAlias.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 windows-all
 sun/security/mscapi/EncodingMutability.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 windows-all
 sun/security/mscapi/IsSunMSCAPIAvailable.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 windows-all
 sun/security/mscapi/IterateWindowsRootStore.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 windows-all
@@ -776,6 +777,7 @@ sun/security/provider/SecureRandom/StrongSeedReader.java https://github.com/ibmr
 sun/security/provider/SeedGenerator/SeedGeneratorChoice.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 sun/security/provider/X509Factory/BadPem.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 sun/security/provider/X509Factory/BigCRL.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
+sun/security/provider/all/Deterministic.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 sun/security/provider/certpath/DisabledAlgorithms/CPBuilder.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 sun/security/provider/certpath/DisabledAlgorithms/CPBuilderWithMD5.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 sun/security/provider/certpath/DisabledAlgorithms/CPValidatorEndEntity.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
@@ -963,6 +965,7 @@ sun/security/tools/keytool/fakecacerts/TrustedCRL.java https://github.com/ibmrun
 sun/security/tools/keytool/fakecacerts/TrustedCert.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 sun/security/tools/keytool/fakegen/DefaultSignatureAlgorithm.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 sun/security/tools/keytool/fakegen/PSS.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
+sun/security/util/Debug/DebugOptions.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 sun/security/util/HostnameChecker/NullHostnameCheck.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 sun/security/util/InternalPrivateKey/Correctness.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
 sun/security/validator/EndEntityExtensionCheck.java https://github.com/ibmruntimes/openj9-openjdk-jdk23/issues/20 aix-all,linux-ppc64le,linux-s390x,linux-x64,windows-all
