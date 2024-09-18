@@ -179,6 +179,7 @@ sun/security/krb5/auto/Basic.java https://github.com/ibmruntimes/openj9-openjdk-
 sun/security/krb5/auto/BasicKrb5Test.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
 sun/security/krb5/auto/BasicProc.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
 sun/security/krb5/auto/BogusKDC.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
+sun/security/krb5/auto/CaseSensitive.java https://github.ibm.com/runtimes/jit-crypto/issues/522 linux-x64,linux-ppc64le,linux-s390x
 sun/security/krb5/auto/CleanState.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
 sun/security/krb5/auto/CrossRealm.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
 sun/security/krb5/auto/DiffNameSameKey.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
