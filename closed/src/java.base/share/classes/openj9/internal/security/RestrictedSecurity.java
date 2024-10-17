@@ -35,10 +35,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -994,6 +994,9 @@ public final class RestrictedSecurity {
         // The java.security properties.
         private final Properties securityProps;
 
+        private final Set<String> profileCheckPropertyNames;
+        private final Set<String> profileCheckProviderNames;
+
         /**
          *
          * @param id    the restricted security custom profile ID
@@ -1016,8 +1019,13 @@ public final class RestrictedSecurity {
 
             parsedProfiles = new HashSet<>();
 
+            profileCheckPropertyNames = new HashSet<>();
+            profileCheckProviderNames = new HashSet<>();
+
             // Initialize the properties.
             init(profileID);
+
+            checkProfileCheck(profileID);
         }
 
         private RestrictedSecurityProperties getProperties() {
@@ -1040,11 +1048,16 @@ public final class RestrictedSecurity {
                 printStackTraceAndExit(profileID + " has already been parsed. Potential infinite recursion.");
             }
 
-            String potentialExtendsProfileID = parseProperty(securityProps.getProperty(profileID + ".extends"));
+            loadProfileCheck(profileID);
+
+            String profileExtends = profileID + ".extends";
+            String potentialExtendsProfileID = parseProperty(securityProps.getProperty(profileExtends));
             if (potentialExtendsProfileID != null) { // If profile extends another profile.
                 if (debug != null) {
                     debug.println("\t'" + profileID + "' extends '" + potentialExtendsProfileID + "'.");
                 }
+
+                profileCheckPropertyNames.remove(profileExtends);
 
                 // Check if extended profile exists.
                 String extendsProfileID = null;
@@ -1098,6 +1111,7 @@ public final class RestrictedSecurity {
                         // Save info to be hashed and expected result to be checked later.
                         profilesHashes.put(profileID, hashValue);
                         profilesInfo.put(profileID, allInfo);
+                        profileCheckPropertyNames.remove(hashProperty);
                     } else if (!isFIPS1402Profile(profileID)) {
                         // A hash is mandatory, but not for older 140-2 profiles.
                         printStackTraceAndExit(profileID + " is a base profile, so a hash value is mandatory.");
@@ -1134,6 +1148,7 @@ public final class RestrictedSecurity {
                     // Save info to be hashed and expected result to be checked later.
                     profilesHashes.put(profileID, hashValue);
                     profilesInfo.put(profileID, allInfo);
+                    profileCheckPropertyNames.remove(hashProperty);
                 }
             } catch (Exception e) {
                 if (debug != null) {
@@ -1254,6 +1269,7 @@ public final class RestrictedSecurity {
                 allInfo.add(property + "=" + providerInfo);
 
                 parseProvider(providerInfo, pNum, false);
+                profileCheckProviderNames.remove(property);
             }
 
             if (providers.isEmpty()) {
@@ -1284,6 +1300,7 @@ public final class RestrictedSecurity {
                         removedProvider = true;
                         break;
                     }
+                    profileCheckProviderNames.remove(property);
                 }
             }
 
@@ -1311,7 +1328,50 @@ public final class RestrictedSecurity {
                 allInfo.add(property + "=" + providerInfo);
 
                 parseProvider(providerInfo, i, false);
+                profileCheckProviderNames.remove(property);
             }
+        }
+
+        private String getExistingValue(String property) {
+            if (debug != null) {
+                debug.println("\tGetting previous value of property: " + property);
+            }
+
+            // Look for values from profiles that this one extends.
+            String existingValue = profileProperties.get(property);
+            String debugMessage = "\t\tPrevious value from extended profile: ";
+
+            // If there is no value, look for non-profile values in java.security file.
+            if (existingValue == null) {
+                debugMessage = "\t\tPrevious value from java.security file: ";
+                String propertyKey;
+                switch (property) {
+                case "jdkCertpathDisabledAlgorithms":
+                    propertyKey = "jdk.certpath.disabledAlgorithms";
+                    break;
+                case "jdkSecurityLegacyAlgorithms":
+                    propertyKey = "jdk.security.legacyAlgorithms";
+                    break;
+                case "jdkTlsDisabledAlgorithms":
+                    propertyKey = "jdk.tls.disabledAlgorithms";
+                    break;
+                case "jdkTlsDisabledNamedCurves":
+                    propertyKey = "jdk.tls.disabledNamedCurves";
+                    break;
+                case "jdkTlsLegacyAlgorithms":
+                    propertyKey = "jdk.tls.legacyAlgorithms";
+                    break;
+                default:
+                    return null;
+                }
+                existingValue = securityProps.getProperty(propertyKey);
+            }
+
+            if ((debug != null) && (existingValue != null)) {
+                debug.println(debugMessage + existingValue);
+            }
+
+            return existingValue;
         }
 
         /**
@@ -1585,7 +1645,7 @@ public final class RestrictedSecurity {
                 allInfo.add(propertyKey + "=" + value);
 
                 // Check if property overrides, adds to or removes from previous value.
-                String existingValue = profileProperties.get(property);
+                String existingValue = getExistingValue(property);
                 if (value.startsWith("+")) {
                     if (!isPropertyAppendable(property)) {
                         printStackTraceAndExit("Property '" + property + "' is not appendable.");
@@ -1595,7 +1655,8 @@ public final class RestrictedSecurity {
 
                         // Take existing value of property into account, if applicable.
                         if (existingValue == null) {
-                            printStackTraceAndExit("Property '" + property + "' does not exist in parent profile. Cannot append.");
+                            printStackTraceAndExit("Property '" + property + "' does not exist in"
+                                    + " parent profile or java.security file. Cannot append.");
                         } else if (existingValue.isBlank()) {
                             newValue = value;
                         } else {
@@ -1609,6 +1670,10 @@ public final class RestrictedSecurity {
                         // Remove values from property.
                         value = value.substring(1).trim();
                         if (!value.isBlank()) {
+                            if (existingValue == null) {
+                                printStackTraceAndExit("Property '" + property + "' does not exist in"
+                                    + " parent profile or java.security file. Cannot remove.");
+                            }
                             List<String> existingValues = Stream.of(existingValue.split(","))
                                                                 .map(v -> v.trim())
                                                                 .collect(Collectors.toList());
@@ -1622,7 +1687,8 @@ public final class RestrictedSecurity {
                         } else {
                             // Nothing to do. Use existing value of property into account, if available.
                             if (existingValue == null) {
-                                printStackTraceAndExit("Property '" + property + "' does not exist in parent profile. Cannot remove.");
+                                printStackTraceAndExit("Property '" + property + "' does not exist in"
+                                    + " parent profile or java.security file. Cannot remove.");
                             } else if (existingValue.isBlank()) {
                                 newValue = value;
                             } else {
@@ -1634,6 +1700,7 @@ public final class RestrictedSecurity {
                     newValue = value;
                 }
                 profileProperties.put(property, newValue);
+                profileCheckPropertyNames.remove(propertyKey);
                 return true;
             }
             if (debug != null) {
@@ -1704,6 +1771,39 @@ public final class RestrictedSecurity {
                 }
             } else {
                 printStackTraceAndExit("Provider format is incorrect: " + providerInfo);
+            }
+        }
+
+        private void loadProfileCheck(String profileID) {
+            Enumeration<?> pNames = securityProps.propertyNames();
+            String profileDot = profileID + '.';
+            while (pNames.hasMoreElements()) {
+                String name = (String) pNames.nextElement();
+                if (name.startsWith(profileDot)) {
+                    if (name.contains(".jce.provider.")) {
+                        profileCheckProviderNames.add(name);
+                    } else {
+                        profileCheckPropertyNames.add(name);
+                    }
+                }
+            }
+        }
+
+        private void checkProfileCheck(String profileID) {
+            if (!profileCheckProviderNames.isEmpty()) {
+                printStackTraceAndExit(
+                        "The order numbers of providers in profile " + profileID
+                                + " (or a base profile) are not consecutive.");
+            }
+            if (!profileCheckPropertyNames.isEmpty()) {
+                printStackTraceAndExit(
+                        "The property names: "
+                                + profileCheckPropertyNames
+                                        .stream()
+                                        .sorted()
+                                        .collect(Collectors.joining(", "))
+                                + " in profile " + profileID
+                                + " (or a base profile) are not recognized.");
             }
         }
     }
